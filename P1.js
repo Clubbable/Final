@@ -90,10 +90,15 @@ function init() {
     container.appendChild( renderer.domElement );
 
     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
+    document.addEventListener('keydown',onDocumentKeyDown,false);
     //
 
     window.addEventListener( 'resize', onWindowResize, false );
+
+    camera.position.x = 50;
+    camera.position.y = 50;
+
+    camera.lookAt( scene.position );
 
 }
 
@@ -116,6 +121,31 @@ function onDocumentMouseMove( event ) {
 
 }
 
+function onDocumentKeyDown(event) {
+    var delta = 10;
+    event = event || window.event;
+    var keycode = event.keyCode;
+    switch (keycode) {
+        case 37 : //left arrow 向左箭头
+            camera.position.y -= delta;
+            console.log(camera.position.y);
+            break;
+        case 38 : // up arrow 向上箭头
+            camera.position.x = camera.position.x - delta;
+            console.log(camera.position.x);
+            break;
+        case 39 : // right arrow 向右箭头
+            camera.position.y = camera.position.y + delta;
+            console.log(camera.position.y);
+            break;
+        case 40 : //down arrow向下箭头
+            camera.position.x = camera.position.x + delta;
+            console.log(camera.position.x);
+            break;
+    }
+
+    renderer.render( scene, camera );
+}
 //
 
 function animate() {
@@ -126,11 +156,6 @@ function animate() {
 }
 
 function render() {
-
-    camera.position.x += ( mouseX - camera.position.x ) * .05;
-    camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-    camera.lookAt( scene.position );
 
     renderer.render( scene, camera );
 
