@@ -4,7 +4,6 @@ var container;
 var camera, scene, renderer;
 
 var mouseX = 0, mouseY = 0;
-var lookAtposition;
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
@@ -26,7 +25,7 @@ function init() {
 
     scene = new THREE.Scene();
 
-    var ambient = new THREE.AmbientLight( 0x101030 );
+    var ambient = new THREE.AmbientLight( 0xffffff );
     scene.add( ambient );
 
     var directionalLight = new THREE.DirectionalLight( 0xffeedd );
@@ -36,27 +35,10 @@ function init() {
     // texture
 
     var manager = new THREE.LoadingManager();
-    manager.onProgress = function ( item, loaded, total ) {
-
-        console.log( item, loaded, total );
-
-    };
-
     var texture = new THREE.Texture();
 
-    var onProgress = function ( xhr ) {
-        if ( xhr.lengthComputable ) {
-            var percentComplete = xhr.loaded / xhr.total * 100;
-            console.log( Math.round(percentComplete, 2) + '% downloaded' );
-        }
-    };
-
-    var onError = function ( xhr ) {
-    };
-
-
     var loader = new THREE.ImageLoader( manager );
-    loader.load( 'textures/UV_Grid_Sm.jpg', function ( image ) {
+    loader.load( 'wall-1.jpg', function ( image ) {
 
         texture.image = image;
         texture.needsUpdate = true;
@@ -66,7 +48,7 @@ function init() {
     // model
 
     var loader = new THREE.OBJLoader( manager );
-    loader.load( 'obj/male02/male02.obj', function ( object ) {
+    loader.load( 'male02.obj', function ( object ) {
 
         object.traverse( function ( child ) {
 
@@ -76,12 +58,19 @@ function init() {
 
             }
 
-        } );
+        });
 
         object.position.y = - 95;
         scene.add( object );
 
-    }, onProgress, onError );
+    });
+
+    var geometry = new THREE.CubeGeometry( 10, 10, 10);
+    var material = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('wall-1.jpg') } );
+
+    var mesh = new THREE.Mesh(geometry, material );
+    mesh.position.y = -50;
+    scene.add( mesh );
 
     //
 
