@@ -4,6 +4,7 @@ var container;
 var camera, scene, renderer;
 
 var mouseX = 0, mouseY = 0;
+var lookAtposition;
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
@@ -114,37 +115,71 @@ function onWindowResize() {
 
 }
 
+var prevX = 0, prevY = 0;
+
 function onDocumentMouseMove( event ) {
 
     mouseX = ( event.clientX - windowHalfX ) / 2;
     mouseY = ( event.clientY - windowHalfY ) / 2;
 
+    var cameraLookAt = new THREE.Vector3(camera.lookAt.x, camera.lookAt.y, camera.lookAt.z);
+    var cameraPosition = new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z);
+
+    cameraLookAt.subVectors(cameraLookAt , cameraPosition);
+    cameraLookAt.applyAxisAngle( new THREE.Vector3(0,1,0), -(mouseX - prevX)*Math.PI/1800 );
+    cameraLookAt.applyAxisAngle( new THREE.Vector3(1,0,0), -(mouseY - prevY)*Math.PI/1800 );
+    cameraLookAt.addVectors(cameraPosition, cameraLookAt);
+
+    camera.lookAt.x = cameraLookAt.x;
+    camera.lookAt.y = cameraLookAt.y;
+    camera.lookAt.z = cameraLookAt.z;
+    camera.lookAt(cameraLookAt);
+
+    prevX = mouseX;
+    prevY = mouseY;
 }
 
 function onDocumentKeyDown(event) {
     var delta = 10;
     event = event || window.event;
     var keycode = event.keyCode;
+
+    var cameraLookAt = new THREE.Vector3(camera.lookAt.x, camera.lookAt.y, camera.lookAt.z);
+    var cameraPosition = new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z);
+
+    cameraLookAt.subVectors(cameraLookAt , cameraPosition);
+
+    var cameraLeftHand = new THREE.Vector3();
+    cameraLeftHand.crossVectors(cameraLookAt, camera.up);
+
+    var cameraLookAtNormalized = cameraLookAt.normalize();
+    var cameraLeftHandNormalized = cameraLeftHand.normalize();
+
     switch (keycode) {
-        case 37 : //left arrow 向左箭头
-            camera.position.y -= delta;
-            console.log(camera.position.y);
+        case 37 :
+            camera.position.x = camera.position.x - delta*cameraLeftHandNormalized.x;
+            camera.position.y = camera.position.y - delta*cameraLeftHandNormalized.y;
+            camera.position.z = camera.position.z - delta*cameraLeftHandNormalized.z;
             break;
-        case 38 : // up arrow 向上箭头
-            camera.position.x = camera.position.x - delta;
-            console.log(camera.position.x);
+        case 38 :
+            camera.position.x = camera.position.x + delta*cameraLookAtNormalized.x;
+            camera.position.y = camera.position.y + delta*cameraLookAtNormalized.y;
+            camera.position.z = camera.position.z + delta*cameraLookAtNormalized.z;
             break;
-        case 39 : // right arrow 向右箭头
-            camera.position.y = camera.position.y + delta;
-            console.log(camera.position.y);
+        case 39 :
+            camera.position.x = camera.position.x + delta*cameraLeftHandNormalized.x;
+            camera.position.y = camera.position.y + delta*cameraLeftHandNormalized.y;
+            camera.position.z = camera.position.z + delta*cameraLeftHandNormalized.z;
             break;
-        case 40 : //down arrow向下箭头
-            camera.position.x = camera.position.x + delta;
-            console.log(camera.position.x);
+        case 40 :
+            camera.position.x = camera.position.x - delta*cameraLookAtNormalized.x;
+            camera.position.y = camera.position.y - delta*cameraLookAtNormalized.y;
+            camera.position.z = camera.position.z - delta*cameraLookAtNormalized.z;
             break;
     }
 
     renderer.render( scene, camera );
+
 }
 //
 
