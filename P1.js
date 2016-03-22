@@ -20,6 +20,8 @@ function init() {
 
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
     camera.position.z = 250;
+    camera.position.x = 150;
+    camera.position.y = 0;
 
     // scene
 
@@ -65,7 +67,7 @@ function init() {
 
     });
 
-    var WALLSIZEX = 50, WALLSIZEY = 50, WALLSIZEZ=50;
+    var WALLSIZEX = 200, WALLSIZEY = 200, WALLSIZEZ=200;
     var geometry = new THREE.CubeGeometry( WALLSIZEX, WALLSIZEY, WALLSIZEZ);
     var material = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('wall-1.jpg') } );
 
@@ -140,15 +142,13 @@ function onDocumentMouseMove( event ) {
     cameraLookAt.addVectors(cameraPosition, cameraLookAt);
 
     camera.lookAt.x = cameraLookAt.x;
-    camera.lookAt.y = cameraLookAt.y;
     camera.lookAt.z = cameraLookAt.z;
+    camera.lookAt.y = 0;
     camera.lookAt(cameraLookAt);
 
     prevX = mouseX;
     prevY = mouseY;
 
-    console.log("window", windowHalfX);
-    console.log("mouse", mouseX);
 }
 
 function onDocumentKeyDown(event) {
@@ -184,6 +184,8 @@ function onDocumentKeyDown(event) {
             camera.position.x = camera.position.x - delta*cameraLookAtNormalized.x;
             camera.position.z = camera.position.z - delta*cameraLookAtNormalized.z;
             break;
+        case 32 :
+            resetCamera();
     }
 
     renderer.render( scene, camera );
@@ -196,6 +198,7 @@ function animate() {
     requestAnimationFrame( animate );
     render();
     mouseCorrection()
+    camera.position.y = 0;
 
 }
 
@@ -211,10 +214,11 @@ function mouseCorrection()
         cameraLookAt.addVectors(cameraPosition, cameraLookAt);
 
         camera.lookAt.x = cameraLookAt.x;
-        camera.lookAt.y = cameraLookAt.y;
         camera.lookAt.z = cameraLookAt.z;
+        camera.lookAt.y = 0;
         camera.lookAt(cameraLookAt);
     }
+
 
     if(windowHalfY - Math.abs(mouseY*2) <= 60)
     {
@@ -226,14 +230,26 @@ function mouseCorrection()
         cameraLookAt.addVectors(cameraPosition, cameraLookAt);
 
         camera.lookAt.x = cameraLookAt.x;
-        camera.lookAt.y = cameraLookAt.y;
         camera.lookAt.z = cameraLookAt.z;
+        camera.lookAt.y = 0;
         camera.lookAt(cameraLookAt);
     }
+
 }
 
 function render() {
 
     renderer.render( scene, camera );
 
+}
+
+function resetCamera(){
+    camera.position.z = 250;
+    camera.position.x = 150;
+    camera.position.y = 0;
+
+    camera.lookAt.x = 0;
+    camera.lookAt.y = 0;
+    camera.lookAt.z = 0;
+    camera.lookAt(new THREE.Vector3(0,0,0));
 }
