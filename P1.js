@@ -13,19 +13,18 @@ var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
 var WALLSIZEX = 100, WALLSIZEY = 100, WALLSIZEZ=200;
-var CAMERASTARTX = 150, CAMERASTARTZ = 150, CAMERASTARTY = 0;
 
 var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 0, 0, 0, 0, 0, 0, 2, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 3, 0, 0, 0, 0, 0, 0, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 0, 0, 0, 0, 0, 0, 3, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 3, 0, 0, 0, 0, 0, 0, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 0, 0, 0, 0, 0, 0, 3, 1,],
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
 
 
@@ -34,25 +33,20 @@ var map = [
 init();
 animate();
 
-var crab;
-
+var crabs;
 
 function init() {
+
+    crabs = [];
 
     container = document.createElement( 'div' );
     document.body.appendChild( container );
 
     camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 7000 );
-    camera.position.y = CAMERASTARTY;
-    camera.position.x = CAMERASTARTX;
-    camera.position.z = CAMERASTARTZ;
 
     // scene
 
     scene = new THREE.Scene();
-
-    crab = new Crab();
-    crab.createCrab(new THREE.Vector3(CAMERASTARTX, CAMERASTARTY, CAMERASTARTZ), scene);
 
     var ambient = new THREE.AmbientLight( 0xffffff );
     scene.add( ambient );
@@ -124,6 +118,18 @@ function init() {
                 mesh.position.x = i*WALLSIZEX;
                 mesh.position.z = j*WALLSIZEY;
                 scene.add( mesh );
+            }
+            if (map[i][j] == 2)
+            {
+                camera.position.x = i*WALLSIZEX;
+                camera.position.z = j*WALLSIZEY;
+            }
+            if (map[i][j] == 3)
+            {
+                var crab = new Crab();
+                crab.createCrab(new THREE.Vector3(i*WALLSIZEX, 0, j*WALLSIZEY), scene);
+
+                crabs.push(crab);
             }
         }
     }

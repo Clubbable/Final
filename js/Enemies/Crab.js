@@ -3,7 +3,7 @@
  */
 function Crab(){
 
-    this.location = new THREE.Vector3(CAMERASTARTX, CAMERASTARTY, CAMERASTARTZ);
+    this.location = new THREE.Vector3(0, 0, 0);
     this.headMatrix = new THREE.Matrix4().set(1,0,0,0, 0,1,0,0, 0,0,1,17, 0,0,0,1);
 
     this.crabTorso;
