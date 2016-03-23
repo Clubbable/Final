@@ -1,3 +1,7 @@
+THREE.Object3D.prototype.setMatrix = function(a) {
+    this.matrix=a;
+    this.matrix.decompose(this.position,this.quaternion,this.scale);
+}
 
 var container;
 
@@ -9,6 +13,7 @@ var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
 var WALLSIZEX = 100, WALLSIZEY = 100, WALLSIZEZ=200;
+var CAMERASTARTX = 150, CAMERASTARTZ = 150, CAMERASTARTY = 0;
 
 var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
@@ -23,9 +28,13 @@ var map = [
     [1, 0, 0, 0, 0, 0, 0, 0, 1,],
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
 
+
+
 ], mapW = map.length, mapH = map[0].length;
 init();
 animate();
+
+var crab;
 
 
 function init() {
@@ -34,13 +43,16 @@ function init() {
     document.body.appendChild( container );
 
     camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 7000 );
-    camera.position.y = 0;
-    camera.position.x = 150;
-    camera.position.z = 150;
+    camera.position.y = CAMERASTARTY;
+    camera.position.x = CAMERASTARTX;
+    camera.position.z = CAMERASTARTZ;
 
     // scene
 
     scene = new THREE.Scene();
+
+    crab = new Crab();
+    crab.createCrab(new THREE.Vector3(CAMERASTARTX, CAMERASTARTY, CAMERASTARTZ), scene);
 
     var ambient = new THREE.AmbientLight( 0xffffff );
     scene.add( ambient );
@@ -78,16 +90,12 @@ function init() {
         });
 
         object.position.y = - 95;
-        scene.add( object );
+        //scene.add( object );
 
     });
 
     var geometry = new THREE.CubeGeometry( WALLSIZEX, WALLSIZEY, WALLSIZEZ);
     var material = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('wall-1.jpg') } );
-
-    var mesh = new THREE.Mesh(geometry, material );
-    mesh.position.y = -50;
-    scene.add( mesh );
 
     var floorgeometry = new THREE.CubeGeometry( 1200, 10, 1200);
     var floormaterial = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('ground_pebble_0057_01.jpg') } );
@@ -121,7 +129,6 @@ function init() {
     }
 
     renderer = new THREE.WebGLRenderer();
-    console.log("renderer ", renderer);
     renderer.setSize( window.innerWidth, window.innerHeight );
     container.appendChild( renderer.domElement );
 
@@ -192,7 +199,6 @@ function onDocumentMouseMove( event ) {
 var cameraPrevX, cameraPrevZ;
 
 function onDocumentKeyDown(event) {
-    console.log(isCollide());
 
     var delta = 10;
 
@@ -271,6 +277,8 @@ function animate() {
     render();
     mouseCorrection()
     camera.position.y = 0;
+
+    //crab.move(new THREE.Vector3(0,0,1));
 
 }
 
