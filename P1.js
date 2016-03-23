@@ -8,7 +8,26 @@ var mouseX = 0, mouseY = 0;
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
+var WALLSIZEX = 200, WALLSIZEY = 200, WALLSIZEZ=200;
 
+var map = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1,],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 0, 0, 1, 1, 1, 1, 1, 1,],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 1, 1, 1, 1, 1, 0, 0, 1,],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 0, 0, 1, 1, 1, 1, 1, 1,],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 1, 1, 1, 1, 1, 0, 0, 1,],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 0, 0, 1, 1, 1, 1, 1, 1,],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 1, 1, 1, 1, 1, 0, 0, 1,],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1,],
+
+], mapW = map.length, mapH = map[0].length;
 init();
 animate();
 
@@ -18,10 +37,10 @@ function init() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
 
-    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-    camera.position.z = 250;
-    camera.position.x = 150;
+    camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 7000 );
     camera.position.y = 0;
+    camera.position.x = 226;
+    camera.position.z = 954;
 
     // scene
 
@@ -67,23 +86,12 @@ function init() {
 
     });
 
-    var WALLSIZEX = 200, WALLSIZEY = 200, WALLSIZEZ=200;
     var geometry = new THREE.CubeGeometry( WALLSIZEX, WALLSIZEY, WALLSIZEZ);
     var material = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('wall-1.jpg') } );
 
     var mesh = new THREE.Mesh(geometry, material );
     mesh.position.y = -50;
     scene.add( mesh );
-
-    var map = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1,],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1,],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1,],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1,],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1,],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1,],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1,],
-    ], mapW = map.length, mapH = map[0].length;
 
     for (var i = 0; i < mapW; i++) {
         for (var j = 0, m = map[i].length; j < m; j++) {
@@ -107,11 +115,25 @@ function init() {
 
     window.addEventListener( 'resize', onWindowResize, false );
 
-    camera.position.x = 50;
-    camera.position.y = 50;
-
     camera.lookAt( scene.position );
 
+}
+
+function isCollide() {
+    for (var i = 0; i < mapW; i++) {
+        for (var j = 0, m = map[i].length; j < m; j++) {
+            if (map[i][j] == 1) {
+                if(camera.position.x >= (i-0.5)*WALLSIZEX && camera.position.x <= (i+0.5)*WALLSIZEX)
+                {
+                    if(camera.position.z >= (j-0.5)*WALLSIZEY && camera.position.z <= (j+0.5)*WALLSIZEY)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }
 
 function onWindowResize() {
@@ -151,8 +173,13 @@ function onDocumentMouseMove( event ) {
 
 }
 
+var cameraPrevX, cameraPrevZ;
+
 function onDocumentKeyDown(event) {
+    console.log(isCollide());
+
     var delta = 10;
+
     event = event || window.event;
     var keycode = event.keyCode;
 
@@ -160,6 +187,8 @@ function onDocumentKeyDown(event) {
     var cameraPosition = new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z);
 
     cameraLookAt.subVectors(cameraLookAt , cameraPosition);
+    cameraPrevX = cameraLookAt.x;
+    cameraPrevZ = cameraLookAt.Z;
 
     var cameraLeftHand = new THREE.Vector3();
     cameraLeftHand.crossVectors(cameraLookAt, camera.up);
@@ -171,18 +200,45 @@ function onDocumentKeyDown(event) {
         case 37 :
             camera.position.x = camera.position.x - delta*cameraLeftHandNormalized.x;
             camera.position.z = camera.position.z - delta*cameraLeftHandNormalized.z;
+
+            if(isCollide())
+            {
+                camera.position.x = camera.position.x + delta*cameraLeftHandNormalized.x;
+                camera.position.z = camera.position.z + delta*cameraLeftHandNormalized.z;
+            }
             break;
         case 38 :
             camera.position.x = camera.position.x + delta*cameraLookAtNormalized.x;
             camera.position.z = camera.position.z + delta*cameraLookAtNormalized.z;
+
+            if(isCollide())
+            {
+                camera.position.x = camera.position.x - delta*cameraLookAtNormalized.x;
+                camera.position.z = camera.position.z - delta*cameraLookAtNormalized.z;
+            }
+
             break;
         case 39 :
             camera.position.x = camera.position.x + delta*cameraLeftHandNormalized.x;
             camera.position.z = camera.position.z + delta*cameraLeftHandNormalized.z;
+
+            if(isCollide())
+            {
+                camera.position.x = camera.position.x - delta*cameraLeftHandNormalized.x;
+                camera.position.z = camera.position.z - delta*cameraLeftHandNormalized.z;
+            }
+
             break;
         case 40 :
             camera.position.x = camera.position.x - delta*cameraLookAtNormalized.x;
             camera.position.z = camera.position.z - delta*cameraLookAtNormalized.z;
+
+            if(isCollide())
+            {
+                camera.position.x = camera.position.x + delta*cameraLookAtNormalized.x;
+                camera.position.z = camera.position.z + delta*cameraLookAtNormalized.z;
+            }
+
             break;
         case 32 :
             resetCamera();
@@ -210,23 +266,7 @@ function mouseCorrection()
         var cameraPosition = new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z);
 
         cameraLookAt.subVectors(cameraLookAt , cameraPosition);
-        mouseX > 0 ? cameraLookAt.applyAxisAngle( new THREE.Vector3(0,1,0), -Math.PI/720 ) : cameraLookAt.applyAxisAngle( new THREE.Vector3(0,1,0), Math.PI/720 );
-        cameraLookAt.addVectors(cameraPosition, cameraLookAt);
-
-        camera.lookAt.x = cameraLookAt.x;
-        camera.lookAt.z = cameraLookAt.z;
-        camera.lookAt.y = 0;
-        camera.lookAt(cameraLookAt);
-    }
-
-
-    if(windowHalfY - Math.abs(mouseY*2) <= 60)
-    {
-        var cameraLookAt = new THREE.Vector3(camera.lookAt.x, camera.lookAt.y, camera.lookAt.z);
-        var cameraPosition = new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z);
-
-        cameraLookAt.subVectors(cameraLookAt , cameraPosition);
-        mouseY > 0 ? cameraLookAt.applyAxisAngle( new THREE.Vector3(1,0,0), -Math.PI/720 ) : cameraLookAt.applyAxisAngle( new THREE.Vector3(1,0,0), Math.PI/720 );
+        mouseX > 0 ? cameraLookAt.applyAxisAngle( new THREE.Vector3(0,1,0), -Math.PI/360 ) : cameraLookAt.applyAxisAngle( new THREE.Vector3(0,1,0), Math.PI/360 );
         cameraLookAt.addVectors(cameraPosition, cameraLookAt);
 
         camera.lookAt.x = cameraLookAt.x;
@@ -244,12 +284,8 @@ function render() {
 }
 
 function resetCamera(){
-    camera.position.z = 250;
-    camera.position.x = 150;
-    camera.position.y = 0;
-
-    camera.lookAt.x = 0;
-    camera.lookAt.y = 0;
+    camera.lookAt.x = cameraPrevX;
+    camera.lookAt.y = cameraPrevZ;
     camera.lookAt.z = 0;
     camera.lookAt(new THREE.Vector3(0,0,0));
 }
