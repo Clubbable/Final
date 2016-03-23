@@ -8,14 +8,10 @@ var mouseX = 0, mouseY = 0;
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
-var WALLSIZEX = 200, WALLSIZEY = 200, WALLSIZEZ=200;
+var WALLSIZEX = 100, WALLSIZEY = 100, WALLSIZEZ=200;
 
 var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
-    [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1,],
-    [1, 1, 1, 1, 1, 1, 0, 0, 1,],
     [1, 0, 0, 0, 0, 0, 0, 0, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
     [1, 0, 0, 0, 0, 0, 0, 0, 1,],
@@ -39,8 +35,8 @@ function init() {
 
     camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 7000 );
     camera.position.y = 0;
-    camera.position.x = 226;
-    camera.position.z = 954;
+    camera.position.x = 150;
+    camera.position.z = 150;
 
     // scene
 
@@ -92,6 +88,26 @@ function init() {
     var mesh = new THREE.Mesh(geometry, material );
     mesh.position.y = -50;
     scene.add( mesh );
+
+    var floorgeometry = new THREE.CubeGeometry( 1200, 10, 1200);
+    var floormaterial = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('ground_pebble_0057_01.jpg') } );
+
+    var floor = new THREE.Mesh(floorgeometry, floormaterial );
+    floor.position.y = -50;
+    floor.position.x = 500;
+    floor.position.z = 500;
+
+    scene.add(floor);
+
+    var ceilinggeometry = new THREE.CubeGeometry( 1200, 10, 1200);
+    var ceilingmaterial = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('1_7990x5696.jpg') } );
+
+    var ceiling = new THREE.Mesh(ceilinggeometry, ceilingmaterial );
+    ceiling.position.y = 50;
+    ceiling.position.x = 500;
+    ceiling.position.z = 500;
+
+    scene.add( ceiling );
 
     for (var i = 0; i < mapW; i++) {
         for (var j = 0, m = map[i].length; j < m; j++) {
