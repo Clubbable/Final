@@ -18,13 +18,13 @@ var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
     [1, 0, 0, 0, 0, 0, 0, 2, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 3, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 0, 5, 3, 0, 0, 5, 0, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 0, 0, 0, 0, 0, 0, 3, 1,],
+    [1, 0, 5, 0, 0, 3, 5, 0, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 3, 0, 0, 0, 0, 0, 0, 1,],
+    [1, 0, 5, 3, 0, 0, 5, 0, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 0, 0, 0, 0, 0, 0, 3, 1,],
+    [1, 0, 5, 0, 0, 3, 5, 0, 1,],
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
 
 
@@ -127,9 +127,15 @@ function init() {
             if (map[i][j] == 3)
             {
                 var crab = new Crab();
-                crab.createCrab(new THREE.Vector3(i*WALLSIZEX, 0, j*WALLSIZEY), scene);
+                crab.createCrab(new THREE.Vector3(i*WALLSIZEX, -15, j*WALLSIZEY), scene);
 
                 crabs.push(crab);
+            }
+            if (map[i][j] == 5)
+            {
+                var x = i*WALLSIZEX;
+                var z = j*WALLSIZEY;
+                var m;
             }
         }
     }
@@ -277,6 +283,8 @@ function onDocumentKeyDown(event) {
 }
 //
 
+var lastTime = 0;
+
 function animate() {
 
     requestAnimationFrame( animate );
@@ -284,7 +292,16 @@ function animate() {
     mouseCorrection()
     camera.position.y = 0;
 
-    //crab.move(new THREE.Vector3(0,0,1));
+    for(var i = 0; i < crabs.length; i++)
+    {
+        crabs[i].animate(map, mapW);
+    }
+
+    var now = new Date().getTime();
+
+    //console.log(1000/(now-lastTime));
+
+    lastTime = now;
 
 }
 
