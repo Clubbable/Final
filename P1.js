@@ -61,7 +61,7 @@ function init() {
     var texture = new THREE.Texture();
 
     var loader = new THREE.ImageLoader( manager );
-    loader.load( 'wall-1.jpg', function ( image ) {
+    loader.load( 'Tex_0023_1.png', function ( image ) {
 
         texture.image = image;
         texture.needsUpdate = true;
@@ -70,8 +70,9 @@ function init() {
 
     // model
 
+
     var loader = new THREE.OBJLoader( manager );
-    loader.load( 'male02.obj', function ( object ) {
+    loader.load( 'humvee.obj', function ( object ) {
 
         object.traverse( function ( child ) {
 
@@ -83,8 +84,12 @@ function init() {
 
         });
 
-        object.position.y = - 95;
-        //scene.add( object );
+        object.scale.set(0.1, 0.1, 0.1);
+        object.rotateX(-Math.PI/2);
+        object.position.x = 150;
+        object.position.z = 150;
+        object.position.y = 0;
+        scene.add( object );
 
     });
 
@@ -130,12 +135,6 @@ function init() {
                 crab.createCrab(new THREE.Vector3(i*WALLSIZEX, -15, j*WALLSIZEY), scene);
 
                 crabs.push(crab);
-            }
-            if (map[i][j] == 5)
-            {
-                var x = i*WALLSIZEX;
-                var z = j*WALLSIZEY;
-                var m;
             }
         }
     }
