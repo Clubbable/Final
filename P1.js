@@ -34,8 +34,11 @@ init();
 animate();
 
 var crabs;
+var projector;
 
 function init() {
+
+    projector = new THREE.Projector();
 
     crabs = [];
 
@@ -71,28 +74,6 @@ function init() {
     // model
 
 
-    var loader = new THREE.OBJLoader( manager );
-    loader.load( 'humvee.obj', function ( object ) {
-
-        object.traverse( function ( child ) {
-
-            if ( child instanceof THREE.Mesh ) {
-
-                child.material.map = texture;
-
-            }
-
-        });
-
-        object.scale.set(0.1, 0.1, 0.1);
-        object.rotateX(-Math.PI/2);
-        object.position.x = 150;
-        object.position.z = 150;
-        object.position.y = 0;
-        scene.add( object );
-
-    });
-
     var geometry = new THREE.CubeGeometry( WALLSIZEX, WALLSIZEY, WALLSIZEZ);
     var material = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('wall-1.jpg') } );
 
@@ -114,7 +95,7 @@ function init() {
     ceiling.position.x = 500;
     ceiling.position.z = 500;
 
-    scene.add( ceiling );
+    scene.add(ceiling);
 
     for (var i = 0; i < mapW; i++) {
         for (var j = 0, m = map[i].length; j < m; j++) {
@@ -145,6 +126,7 @@ function init() {
 
     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
     document.addEventListener('keydown',onDocumentKeyDown,false);
+    document.addEventListener('mousedown', onDocumentMouseDown, false);
     //
 
     window.addEventListener( 'resize', onWindowResize, false );
@@ -204,6 +186,28 @@ function onDocumentMouseMove( event ) {
 
     prevX = mouseX;
     prevY = mouseY;
+
+}
+
+function onDocumentMouseDown(e){
+
+    var mouseVector = new THREE.Vector3(
+        ( e.clientX / window.innerWidth ) * 2 - 1,
+        - ( e.clientY / window.innerHeight ) * 2 + 1,
+        1 );
+
+    projector.unprojectVector( mouseVector, camera );
+    var raycaster = new THREE.Raycaster( camera.position, mouseVector.sub( camera.position ).normalize() );
+
+    var intersects = raycaster.intersectObjects( scene.children );
+
+    for(var i = 0; i < intersects.length; i++)
+    {
+        if (intersects[i].object.name == "crab")
+        {
+            scene.remove(intersects[ i ].object);
+        }
+    }
 
 }
 
