@@ -4,9 +4,6 @@
 function Crab(){
 
     this.location = new THREE.Vector3(0, 0, 0);
-    this.headMatrix = new THREE.Matrix4().set(1,0,0,0, 0,1,0,15, 0,0,1,0, 0,0,0,1);
-    this.head2Matrix = new THREE.Matrix4().set(1,0,0,0, 0,1,0,10, 0,0,1,0, 0,0,0,1);
-    this.head3Matrix = new THREE.Matrix4().set(1,0,0,0, 0,1,0,5, 0,0,1,0, 0,0,0,1);
 
     this.crabTorso;
     this.crabHead;
@@ -24,15 +21,16 @@ function Crab(){
         var normalMaterial = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('1_7990x5696.jpg') } );
 
         var headGeometry = Helper.createGeometry(new THREE.Matrix4().set(14,0,0,0, 0,14,0,0, 0,0,14,0, 0,0,0,1));
-        var headMatrixRelativeToTorso =  Helper.createObjectMatrixRelativeTo(torsoMatrix, this.headMatrix, 0,0,0);
+        var headMatrixRelativeToTorso =  new THREE.Matrix4().set(1,0,0,0, 0,1,0,15, 0,0,1,0, 0,0,0,1);;
 
         var head2Geometry = Helper.createGeometry(new THREE.Matrix4().set(8,0,0,0, 0,8,0,0, 0,0,8,0, 0,0,0,1));
-        var head2MatrixRelativeToHead =  Helper.createObjectMatrixRelativeTo(headMatrixRelativeToTorso, this.head2Matrix, 0,0,0);
+        var head2MatrixRelativeToHead =  new THREE.Matrix4().set(1,0,0,0, 0,1,0,25, 0,0,1,0, 0,0,0,1);
 
         var head3Geometry = Helper.createGeometry(new THREE.Matrix4().set(2,0,0,0, 0,2,0,0, 0,0,2,0, 0,0,0,1));
-        var head3MatrixRelativeToHead =  Helper.createObjectMatrixRelativeTo(head2MatrixRelativeToHead, this.head3Matrix, 0,0,0);
+        var head3MatrixRelativeToHead =  new THREE.Matrix4().set(1,0,0,0, 0,1,0,30, 0,0,1,0, 0,0,0,1);
 
         var torso = Helper.addObjectToScene(torsoGeometry, torsoMatrix, normalMaterial, scene);
+        torso.name = "crab";
         this.crabTorso = torso;
 
         var head = Helper.addObjectToScene(headGeometry, headMatrixRelativeToTorso, normalMaterial, scene);
@@ -43,6 +41,11 @@ function Crab(){
 
         var head3 = Helper.addObjectToScene(head3Geometry, head3MatrixRelativeToHead, normalMaterial, scene);
         this.crabHead3 = head3;
+
+        this.crabTorso.add(this.crabHead);
+        this.crabTorso.add(this.crabHead2);
+        this.crabTorso.add(this.crabHead3);
+
     }
 
     this.move = function(deltaMove)
@@ -52,14 +55,6 @@ function Crab(){
         var torsoMatrix = new THREE.Matrix4().set(1,0,0,this.location.x, 0,1,0,this.location.y, 0,0,1,this.location.z, 0,0,0,1);
         this.crabTorso.setMatrix(torsoMatrix);
 
-        var headMatrix = new THREE.Matrix4().multiplyMatrices(torsoMatrix, this.headMatrix);
-        this.crabHead.setMatrix(headMatrix);
-
-        var head2Matrix = new THREE.Matrix4().multiplyMatrices(headMatrix, this.head2Matrix);
-        this.crabHead2.setMatrix(head2Matrix);
-
-        var head3Matrix = new THREE.Matrix4().multiplyMatrices(head2Matrix, this.head3Matrix);
-        this.crabHead3.setMatrix(head3Matrix);
     }
 
     this.animate = function(m, mapW)
@@ -79,9 +74,6 @@ function Crab(){
 
         if(this.isCollide())
         {
-            scene.remove(this.crabHead3);
-            scene.remove(this.crabHead2);
-            scene.remove(this.crabHead);
             scene.remove(this.crabTorso);
         }
     }
