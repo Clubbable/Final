@@ -20,13 +20,13 @@ var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
     [1, 0, 6, 0, 0, 6, 0, 2, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 6, 5, 3, 6, 0, 5, 0, 1,],
+    [1, 6, 5, 3, 6, 0, 5, 6, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 6, 5, 0, 6, 3, 5, 0, 1,],
+    [1, 6, 5, 0, 6, 3, 5, 6, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 6, 5, 3, 6, 0, 5, 0, 1,],
+    [1, 6, 5, 3, 6, 0, 5, 6, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 6, 5, 0, 6, 3, 5, 0, 1,],
+    [1, 6, 5, 0, 6, 3, 5, 6, 1,],
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
 
 
@@ -82,11 +82,7 @@ function init() {
 
 
     var ambient = new THREE.AmbientLight( 0xffffff );
-    scene.add( ambient );
-
-    var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-    directionalLight.position.set( 0, 0, 1 );
-    scene.add( directionalLight );
+    //scene.add( ambient );
 
     // texture
 
