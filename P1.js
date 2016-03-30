@@ -35,6 +35,34 @@ animate();
 
 var crabs;
 var projector;
+var overlay;
+
+function createOverlay(mainCanvas)
+{
+    var canvasContainer = document.getElementById('container');
+    var overlayCanvas = document.createElement('canvas');
+    overlayCanvas.style.zIndex="1000";
+    overlayCanvas.style.position = 'absolute';
+    overlayCanvas.style.left = '0px';
+    overlayCanvas.style.top = '0px';
+    overlayCanvas.width = mainCanvas.clientWidth;
+    overlayCanvas.height = mainCanvas.clientHeight;
+    canvasContainer.appendChild(overlayCanvas);
+    return overlayCanvas;
+}
+
+var fuel = 100;
+
+function drawOverlay() {
+    var context = overlay.getContext('2d');
+    context.clearRect(0, 0, overlay.width, overlay.height);
+    var x = 10;
+    var y = 40;
+    context.font = "20pt Calibri";
+    context.fillStyle = "#0000ff"; // text color
+    context.fillText("Fuel Remaining: "+fuel, x, y);
+    context.restore();
+}
 
 function init() {
 
@@ -120,8 +148,15 @@ function init() {
         }
     }
 
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    var mycanvas = document.getElementsByTagName("canvas")[0];
+    var w = mycanvas.clientWidth;
+    var h = mycanvas.clientHeight;
+
+    if (!overlay)
+        overlay = createOverlay(mycanvas);
+
+    renderer = new THREE.WebGLRenderer({canvas:mycanvas});
+    renderer.setSize( w, h );
     container.appendChild( renderer.domElement );
 
     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -290,6 +325,7 @@ var lastTime = 0;
 
 function animate() {
 
+    drawOverlay();
     requestAnimationFrame( animate );
     render();
     mouseCorrection()
