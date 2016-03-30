@@ -16,6 +16,8 @@ var WALLSIZEX = 100, WALLSIZEY = 100, WALLSIZEZ=200;
 
 var health = 100, points = 0;
 
+var ambient;
+
 var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
     [1, 0, 6, 0, 0, 6, 0, 2, 1,],
@@ -26,7 +28,7 @@ var map = [
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
     [1, 6, 5, 3, 6, 0, 5, 6, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 6, 5, 0, 6, 3, 5, 6, 1,],
+    [1, 6, 5, 0, 6, 3, 5, 8, 1,],
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
 
 
@@ -53,14 +55,14 @@ function createOverlay(mainCanvas)
     return overlayCanvas;
 }
 
-function drawOverlay() {
+function drawOverlay(fps) {
     var context = overlay.getContext('2d');
     context.clearRect(0, 0, overlay.width, overlay.height);
     var x = 10;
     var y = 40;
     context.font = "20pt Calibri";
     context.fillStyle = "#0000ff"; // text color
-    context.fillText("Points: "+points+ "               Health: "+health, x, y);
+    context.fillText("Points: "+points+ "               Health: "+health+ "             FPS:"+parseInt(fps), x, y);
     context.restore();
 }
 
@@ -81,8 +83,9 @@ function init() {
 
 
 
-    var ambient = new THREE.AmbientLight( 0xffffff );
-    //scene.add( ambient );
+    ambient = new THREE.AmbientLight();
+    ambient.color.setRGB(0.75, 0.705, 0.645);
+    scene.add( ambient );
 
     // texture
 
@@ -141,7 +144,7 @@ function init() {
 
                 crabs.push(crab);
             }
-            if (map[i][j] == 6)
+            if (map[i][j] == 6 || map[i][j] == 8)
             {
                 var light1 = new THREE.PointLight( Math.random() * 0xFFFFFF, 5, 100 );
                 light1.position.set(i*WALLSIZEX, 15, j*WALLSIZEY);
@@ -328,12 +331,6 @@ var lastTime = 0;
 
 function animate() {
 
-    drawOverlay();
-    requestAnimationFrame( animate );
-    render();
-    mouseCorrection()
-    camera.position.y = 0;
-
     for(var i = 0; i < crabs.length; i++)
     {
         crabs[i].animate(map, mapW);
@@ -341,9 +338,16 @@ function animate() {
 
     var now = new Date().getTime();
 
-    //console.log(1000/(now-lastTime));
+    drawOverlay(1000/(now-lastTime));
 
     lastTime = now;
+
+    requestAnimationFrame( animate );
+    render();
+    mouseCorrection()
+    camera.position.y = 0;
+
+    ambient.color.setRGB(ambient.color.r - 0.0005, ambient.color.g - 0.0005, ambient.color.b - 0.0005);
 
 }
 
