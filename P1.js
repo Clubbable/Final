@@ -20,6 +20,8 @@ var ambient;
 
 var ceiling, floor;
 
+var isInProgress = true;
+
 var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
     [1, 0, 6, 0, 3, 6, 0, 2, 1,],
@@ -30,7 +32,7 @@ var map = [
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
     [1, 6, 5, 3, 6, 3, 5, 6, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 6, 5, 3, 6, 3, 5, 8, 1,],
+    [1, 6, 5, 3, 6, 3, 5, 6, 1,],
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
 
 
@@ -147,7 +149,7 @@ function init() {
 
                 crabs.push(crab);
             }
-            if (map[i][j] == 6 || map[i][j] == 8)
+            if (map[i][j] == 6)
             {
                 var light1 = new THREE.PointLight( Math.random() * 0xFFFFFF, 5, 100 );
                 light1.position.set(i*WALLSIZEX, 15, j*WALLSIZEY);
@@ -345,28 +347,36 @@ var lastTime = 0;
 
 function animate() {
 
-    for(var i = 0; i < crabs.length; i++)
-    {
-        crabs[i].animate(map, mapW);
+    if(isInProgress) {
+
+        for (var i = 0; i < crabs.length; i++) {
+            crabs[i].animate(map, mapW);
+        }
+
+        for (var i = 0; i < bullets.length; i++) {
+            bullets[i].animate(ceiling.position.y, floor.position.y);
+        }
+
+        var now = new Date().getTime();
+
+        drawOverlay(1000 / (now - lastTime));
+
+        lastTime = now;
+
+        requestAnimationFrame(animate);
+        render();
+        mouseCorrection()
+        camera.position.y = 0;
+
+        ambient.color.setRGB(ambient.color.r - 0.0005, ambient.color.g - 0.0005, ambient.color.b - 0.0005);
     }
 
-    for(var i = 0; i < bullets.length; i++)
+    if(health <= 0 || points >= 4)
     {
-        bullets[i].animate(ceiling.position.y, floor.position.y);
+        isInProgress = false;
+        health <= 0 ? drawGameOverOverlay() : drawYouWinOverlay();
+        scene = null;
     }
-
-    var now = new Date().getTime();
-
-    drawOverlay(1000/(now-lastTime));
-
-    lastTime = now;
-
-    requestAnimationFrame( animate );
-    render();
-    mouseCorrection()
-    camera.position.y = 0;
-
-    ambient.color.setRGB(ambient.color.r - 0.0005, ambient.color.g - 0.0005, ambient.color.b - 0.0005);
 
 }
 
@@ -400,4 +410,26 @@ function resetCamera(){
     camera.lookAt.y = cameraPrevZ;
     camera.lookAt.z = 0;
     camera.lookAt(new THREE.Vector3(0,0,0));
+}
+
+function drawGameOverOverlay() {
+    var context = overlay.getContext('2d');
+    context.clearRect(0, 0, overlay.width, overlay.height);
+    var x = 100;
+    var y = 160;
+    context.font = "54pt Calibri";
+    context.fillStyle = "#0000ff"; // text color
+    context.fillText("GAME OVER!", x, y);
+    context.restore();
+}
+
+function drawYouWinOverlay() {
+    var context = overlay.getContext('2d');
+    context.clearRect(0, 0, overlay.width, overlay.height);
+    var x = 100;
+    var y = 160;
+    context.font = "54pt Calibri";
+    context.fillStyle = "#0000ff"; // text color
+    context.fillText("YOU WIN!", x, y);
+    context.restore();
 }
