@@ -11,6 +11,7 @@ function Crab(){
     this.crabHead3;
 
     this.moveDir = 1;
+    this.isDestroyed = false;
 
     this.createCrab = function(location, scene)
     {
@@ -59,22 +60,23 @@ function Crab(){
 
     this.animate = function(m, mapW)
     {
-        this.move(new THREE.Vector3(0,0,1*this.moveDir));
+        if(!this.isDestroyed) {
+            this.move(new THREE.Vector3(0, 0, 1 * this.moveDir));
 
-        for (var i = 0; i < mapW; i++) {
-            for (var j = 0, m = map[i].length; j < m; j++) {
-                if (map[i][j] == 5 &&
-                    Math.abs(this.location.x - i*WALLSIZEX) <= 30  &&
-                    Math.abs(this.location.z - j*WALLSIZEY) <= 30)
-                {
-                    this.moveDir *= -1;
+            for (var i = 0; i < mapW; i++) {
+                for (var j = 0, m = map[i].length; j < m; j++) {
+                    if (map[i][j] == 5 &&
+                        Math.abs(this.location.x - i * WALLSIZEX) <= 30 &&
+                        Math.abs(this.location.z - j * WALLSIZEY) <= 30) {
+                        this.moveDir *= -1;
+                    }
                 }
             }
-        }
 
-        if(this.isCollide())
-        {
-            scene.remove(this.crabTorso);
+            if (this.isCollide()) {
+                health -= 25;
+                this.destroy();
+            }
         }
     }
 
@@ -89,5 +91,18 @@ function Crab(){
         }
 
         return false;
+    }
+
+    this.destroy = function()
+    {
+        scene.remove(this.crabTorso);
+        this.crabHead3 = null;
+        this.crabHead2 = null;
+        this.crabHead = null;
+        this.crabTorso = null;
+        this.location = new THREE.Vector3(0, 0, 0);
+
+        this.isDestroyed = true;
+
     }
 }

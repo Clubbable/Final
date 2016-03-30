@@ -16,15 +16,15 @@ var WALLSIZEX = 100, WALLSIZEY = 100, WALLSIZEZ=200;
 
 var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
-    [1, 0, 0, 0, 0, 0, 0, 2, 1,],
+    [1, 0, 6, 0, 0, 6, 0, 2, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 0, 5, 3, 0, 0, 5, 0, 1,],
+    [1, 6, 5, 3, 6, 0, 5, 0, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 0, 5, 0, 0, 3, 5, 0, 1,],
+    [1, 6, 5, 0, 6, 3, 5, 0, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 0, 5, 3, 0, 0, 5, 0, 1,],
+    [1, 6, 5, 3, 6, 0, 5, 0, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 0, 5, 0, 0, 3, 5, 0, 1,],
+    [1, 6, 5, 0, 6, 3, 5, 0, 1,],
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
 
 
@@ -79,6 +79,8 @@ function init() {
 
     scene = new THREE.Scene();
 
+
+
     var ambient = new THREE.AmbientLight( 0xffffff );
     scene.add( ambient );
 
@@ -98,9 +100,6 @@ function init() {
         texture.needsUpdate = true;
 
     } );
-
-    // model
-
 
     var geometry = new THREE.CubeGeometry( WALLSIZEX, WALLSIZEY, WALLSIZEZ);
     var material = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('wall-1.jpg') } );
@@ -132,6 +131,7 @@ function init() {
                 mesh.position.x = i*WALLSIZEX;
                 mesh.position.z = j*WALLSIZEY;
                 scene.add( mesh );
+
             }
             if (map[i][j] == 2)
             {
@@ -144,6 +144,12 @@ function init() {
                 crab.createCrab(new THREE.Vector3(i*WALLSIZEX, -15, j*WALLSIZEY), scene);
 
                 crabs.push(crab);
+            }
+            if (map[i][j] == 6)
+            {
+                var light1 = new THREE.PointLight( 0xff0040, 5, 100 );
+                light1.position.set(i*WALLSIZEX, 15, j*WALLSIZEY);
+                scene.add( light1 );
             }
         }
     }
