@@ -14,6 +14,8 @@ var windowHalfY = window.innerHeight / 2;
 
 var WALLSIZEX = 100, WALLSIZEY = 100, WALLSIZEZ=200;
 
+var health = 100, points = 0;
+
 var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
     [1, 0, 6, 0, 0, 6, 0, 2, 1,],
@@ -29,7 +31,7 @@ var map = [
 
 
 
-], mapW = map.length, mapH = map[0].length;
+], mapW = map.length;
 init();
 animate();
 
@@ -51,8 +53,6 @@ function createOverlay(mainCanvas)
     return overlayCanvas;
 }
 
-var fuel = 100;
-
 function drawOverlay() {
     var context = overlay.getContext('2d');
     context.clearRect(0, 0, overlay.width, overlay.height);
@@ -60,7 +60,7 @@ function drawOverlay() {
     var y = 40;
     context.font = "20pt Calibri";
     context.fillStyle = "#0000ff"; // text color
-    context.fillText("Fuel Remaining: "+fuel, x, y);
+    context.fillText("Points: "+points+ "               Health: "+health, x, y);
     context.restore();
 }
 
@@ -147,7 +147,7 @@ function init() {
             }
             if (map[i][j] == 6)
             {
-                var light1 = new THREE.PointLight( 0xff0040, 5, 100 );
+                var light1 = new THREE.PointLight( Math.random() * 0xFFFFFF, 5, 100 );
                 light1.position.set(i*WALLSIZEX, 15, j*WALLSIZEY);
                 scene.add( light1 );
             }
@@ -247,6 +247,7 @@ function onDocumentMouseDown(e){
         if (intersects[i].object.name == "crab")
         {
             scene.remove(intersects[ i ].object);
+            points++;
         }
     }
 
