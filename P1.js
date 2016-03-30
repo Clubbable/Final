@@ -18,17 +18,19 @@ var health = 100, points = 0;
 
 var ambient;
 
+var ceiling, floor;
+
 var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
-    [1, 0, 6, 0, 0, 6, 0, 2, 1,],
+    [1, 0, 6, 0, 3, 6, 0, 2, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 6, 5, 3, 6, 0, 5, 6, 1,],
+    [1, 6, 5, 3, 6, 3, 5, 6, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 6, 5, 0, 6, 3, 5, 6, 1,],
+    [1, 6, 5, 3, 6, 3, 5, 6, 1,],
     [1, 0, 0, 1, 1, 1, 1, 1, 1,],
-    [1, 6, 5, 3, 6, 0, 5, 6, 1,],
+    [1, 6, 5, 3, 6, 3, 5, 6, 1,],
     [1, 1, 1, 1, 1, 1, 0, 0, 1,],
-    [1, 6, 5, 0, 6, 3, 5, 8, 1,],
+    [1, 6, 5, 3, 6, 3, 5, 8, 1,],
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
 
 
@@ -37,7 +39,7 @@ var map = [
 init();
 animate();
 
-var crabs;
+var crabs, bullets;
 var projector;
 var overlay;
 
@@ -71,6 +73,7 @@ function init() {
     projector = new THREE.Projector();
 
     crabs = [];
+    bullets = [];
 
     container = document.createElement( 'div' );
     document.body.appendChild( container );
@@ -106,7 +109,7 @@ function init() {
     var floorgeometry = new THREE.CubeGeometry( 1200, 10, 1200);
     var floormaterial = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('ground_pebble_0057_01.jpg') } );
 
-    var floor = new THREE.Mesh(floorgeometry, floormaterial );
+    floor = new THREE.Mesh(floorgeometry, floormaterial );
     floor.position.y = -50;
     floor.position.x = 500;
     floor.position.z = 500;
@@ -116,7 +119,7 @@ function init() {
     var ceilinggeometry = new THREE.CubeGeometry( 1200, 10, 1200);
     var ceilingmaterial = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('1_7990x5696.jpg') } );
 
-    var ceiling = new THREE.Mesh(ceilinggeometry, ceilingmaterial );
+    ceiling = new THREE.Mesh(ceilinggeometry, ceilingmaterial );
     ceiling.position.y = 50;
     ceiling.position.x = 500;
     ceiling.position.z = 500;
@@ -175,13 +178,13 @@ function init() {
 
 }
 
-function isCollide() {
+function isCollideWithMap(object) {
     for (var i = 0; i < mapW; i++) {
         for (var j = 0, m = map[i].length; j < m; j++) {
             if (map[i][j] == 1) {
-                if(camera.position.x >= (i-0.5)*WALLSIZEX && camera.position.x <= (i+0.5)*WALLSIZEX)
+                if(object.position.x >= (i-0.5)*WALLSIZEX && object.position.x <= (i+0.5)*WALLSIZEX)
                 {
-                    if(camera.position.z >= (j-0.5)*WALLSIZEY && camera.position.z <= (j+0.5)*WALLSIZEY)
+                    if(object.position.z >= (j-0.5)*WALLSIZEY && object.position.z <= (j+0.5)*WALLSIZEY)
                     {
                         return true;
                     }
@@ -241,6 +244,17 @@ function onDocumentMouseDown(e){
 
     var intersects = raycaster.intersectObjects( scene.children );
 
+    if(intersects[0] != null)
+    {
+        var bullet = new Bullet();
+        var cameraPos = new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z);
+        var movementVector = new THREE.Vector3(intersects[0].point.x, intersects[0].point.y, intersects[0].point.z);
+        movementVector.sub(cameraPos);
+
+        bullet.createBullet(cameraPos, movementVector, scene);
+        bullets.push(bullet);
+    }
+
     for(var i = 0; i < intersects.length; i++)
     {
         if (intersects[i].object.name == "crab")
@@ -279,7 +293,7 @@ function onDocumentKeyDown(event) {
             camera.position.x = camera.position.x - delta*cameraLeftHandNormalized.x;
             camera.position.z = camera.position.z - delta*cameraLeftHandNormalized.z;
 
-            if(isCollide())
+            if(isCollideWithMap(camera))
             {
                 camera.position.x = camera.position.x + delta*cameraLeftHandNormalized.x;
                 camera.position.z = camera.position.z + delta*cameraLeftHandNormalized.z;
@@ -289,7 +303,7 @@ function onDocumentKeyDown(event) {
             camera.position.x = camera.position.x + delta*cameraLookAtNormalized.x;
             camera.position.z = camera.position.z + delta*cameraLookAtNormalized.z;
 
-            if(isCollide())
+            if(isCollideWithMap(camera))
             {
                 camera.position.x = camera.position.x - delta*cameraLookAtNormalized.x;
                 camera.position.z = camera.position.z - delta*cameraLookAtNormalized.z;
@@ -300,7 +314,7 @@ function onDocumentKeyDown(event) {
             camera.position.x = camera.position.x + delta*cameraLeftHandNormalized.x;
             camera.position.z = camera.position.z + delta*cameraLeftHandNormalized.z;
 
-            if(isCollide())
+            if(isCollideWithMap(camera))
             {
                 camera.position.x = camera.position.x - delta*cameraLeftHandNormalized.x;
                 camera.position.z = camera.position.z - delta*cameraLeftHandNormalized.z;
@@ -311,7 +325,7 @@ function onDocumentKeyDown(event) {
             camera.position.x = camera.position.x - delta*cameraLookAtNormalized.x;
             camera.position.z = camera.position.z - delta*cameraLookAtNormalized.z;
 
-            if(isCollide())
+            if(isCollideWithMap(camera))
             {
                 camera.position.x = camera.position.x + delta*cameraLookAtNormalized.x;
                 camera.position.z = camera.position.z + delta*cameraLookAtNormalized.z;
@@ -334,6 +348,11 @@ function animate() {
     for(var i = 0; i < crabs.length; i++)
     {
         crabs[i].animate(map, mapW);
+    }
+
+    for(var i = 0; i < bullets.length; i++)
+    {
+        bullets[i].animate(ceiling.position.y, floor.position.y);
     }
 
     var now = new Date().getTime();
