@@ -20,7 +20,11 @@ var ambient;
 
 var ceiling, floor;
 
+var fps = 60;
+
 var isInProgress = true;
+
+var clock;
 
 var map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1,],
@@ -59,13 +63,13 @@ function createOverlay(mainCanvas)
     return overlayCanvas;
 }
 
-function drawOverlay(fps) {
+function drawOverlay() {
     var context = overlay.getContext('2d');
     context.clearRect(0, 0, overlay.width, overlay.height);
     var x = 10;
     var y = overlay.height - 60;
     context.font = "20pt Calibri";
-    context.fillStyle = "#B0171F";
+    context.fillStyle = "#FFFF00";
     context.fillText("Points: "+points+ "               Health: "+health+ "             FPS:"+parseInt(fps), x, y);
 
     context.fillStyle = "#0000ff";
@@ -93,6 +97,7 @@ function drawOverlay(fps) {
 
 function init() {
 
+    clock = new THREE.Clock(true);
     projector = new THREE.Projector();
 
     crabs = [];
@@ -112,19 +117,6 @@ function init() {
     ambient = new THREE.AmbientLight();
     ambient.color.setRGB(0.75, 0.705, 0.645);
     scene.add( ambient );
-
-    // texture
-
-    var manager = new THREE.LoadingManager();
-    var texture = new THREE.Texture();
-
-    var loader = new THREE.ImageLoader( manager );
-    loader.load( 'Tex_0023_1.png', function ( image ) {
-
-        texture.image = image;
-        texture.needsUpdate = true;
-
-    } );
 
     var geometry = new THREE.CubeGeometry( WALLSIZEX, WALLSIZEY, WALLSIZEZ);
     var material = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('wall-1.jpg') } );
@@ -352,9 +344,9 @@ function onDocumentKeyDown(event) {
     renderer.render( scene, camera );
 
 }
-//
 
-var lastTime = 0;
+var counter = 0;
+var timer = 0;
 
 function animate() {
 
@@ -367,12 +359,19 @@ function animate() {
         for (var i = 0; i < bullets.length; i++) {
             bullets[i].animate(ceiling.position.y, floor.position.y);
         }
+        
+        var delta = parseInt(clock.getElapsedTime());
+        if(delta == timer)
+        {
+            timer++;
+            fps = counter;
+            counter = 0;
+        }
 
-        var now = new Date().getTime();
 
-        drawOverlay(1000 / (now - lastTime));
 
-        lastTime = now;
+        drawOverlay();
+
 
         requestAnimationFrame(animate);
         render();
@@ -380,6 +379,8 @@ function animate() {
         camera.position.y = 0;
 
         ambient.color.setRGB(ambient.color.r - 0.0005, ambient.color.g - 0.0005, ambient.color.b - 0.0005);
+
+        counter++;
     }
 
     if(health <= 0 || points >= 4)
