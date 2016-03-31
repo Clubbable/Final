@@ -19,7 +19,7 @@ function Crab(){
 
         var torsoGeometry = Helper.createGeometry(new THREE.Matrix4().set(20,0,0,0, 0,20,0,0, 0,0,20,0, 0,0,0,1));
         var torsoMatrix = new THREE.Matrix4().set(1,0,0,this.location.x, 0,1,0,this.location.y, 0,0,1,this.location.z, 0,0,0,1);
-        var normalMaterial = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('1_7990x5696.jpg') } );
+        var normalMaterial = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('grass.jpg') } );
 
         var headGeometry = Helper.createGeometry(new THREE.Matrix4().set(14,0,0,0, 0,14,0,0, 0,0,14,0, 0,0,0,1));
         var headMatrixRelativeToTorso =  new THREE.Matrix4().set(1,0,0,0, 0,1,0,15, 0,0,1,0, 0,0,0,1);;
@@ -72,22 +72,20 @@ function Crab(){
                 }
             }
 
-            if (this.isCollide(bullets)) {
+            if (this.isCollideCamera(camera)) {
                 health -= 25;
+                this.destroy();
+            }
+
+            if(this.isCollideBullets(bullets)){
+                points++;
                 this.destroy();
             }
         }
     }
 
-    this.isCollide = function(bullets)
+    this.isCollideBullets = function(bullets)
     {
-        if(camera.position.x >= this.location.x - 10 && camera.position.x <= this.location.x+10)
-        {
-            if(camera.position.z >= this.location.z -10 && camera.position.z <= this.location.z+10)
-            {
-                return true;
-            }
-        }
 
         for(var i = 0; i < bullets.length; i++)
         {
@@ -100,6 +98,19 @@ function Crab(){
                         return true;
                     }
                 }
+            }
+        }
+
+        return false;
+    }
+
+    this.isCollideCamera = function()
+    {
+        if(camera.position.x >= this.location.x - 10 && camera.position.x <= this.location.x+10)
+        {
+            if(camera.position.z >= this.location.z -10 && camera.position.z <= this.location.z+10)
+            {
+                return true;
             }
         }
 
