@@ -31,7 +31,6 @@ function Crab(){
         var head3MatrixRelativeToHead =  new THREE.Matrix4().set(1,0,0,0, 0,1,0,30, 0,0,1,0, 0,0,0,1);
 
         var torso = Helper.addObjectToScene(torsoGeometry, torsoMatrix, normalMaterial, scene);
-        torso.name = "crab";
         this.crabTorso = torso;
 
         var head = Helper.addObjectToScene(headGeometry, headMatrixRelativeToTorso, normalMaterial, scene);
@@ -58,7 +57,7 @@ function Crab(){
 
     }
 
-    this.animate = function(m, mapW)
+    this.animate = function(m, mapW, bullets)
     {
         if(!this.isDestroyed) {
             this.move(new THREE.Vector3(0, 0, 1 * this.moveDir));
@@ -73,20 +72,34 @@ function Crab(){
                 }
             }
 
-            if (this.isCollide()) {
+            if (this.isCollide(bullets)) {
                 health -= 25;
                 this.destroy();
             }
         }
     }
 
-    this.isCollide = function()
+    this.isCollide = function(bullets)
     {
         if(camera.position.x >= this.location.x - 10 && camera.position.x <= this.location.x+10)
         {
             if(camera.position.z >= this.location.z -10 && camera.position.z <= this.location.z+10)
             {
                 return true;
+            }
+        }
+
+        for(var i = 0; i < bullets.length; i++)
+        {
+            if(bullets[i].position.x >= this.location.x - 10 && bullets[i].position.x <= this.location.x+10)
+            {
+                if(bullets[i].position.z >= this.location.z -10 && bullets[i].position.z <= this.location.z+10)
+                {
+                    if(bullets[i].position.y >= this.location.y -10 && bullets[i].position.y <= this.location.y+50)
+                    {
+                        return true;
+                    }
+                }
             }
         }
 
@@ -100,7 +113,7 @@ function Crab(){
         this.crabHead2 = null;
         this.crabHead = null;
         this.crabTorso = null;
-        this.location = new THREE.Vector3(0, 0, 0);
+        this.location = new THREE.Vector3(-500, -500, -500);
 
         this.isDestroyed = true;
 

@@ -63,10 +63,31 @@ function drawOverlay(fps) {
     var context = overlay.getContext('2d');
     context.clearRect(0, 0, overlay.width, overlay.height);
     var x = 10;
-    var y = 40;
+    var y = overlay.height - 60;
     context.font = "20pt Calibri";
-    context.fillStyle = "#0000ff"; // text color
+    context.fillStyle = "#B0171F";
     context.fillText("Points: "+points+ "               Health: "+health+ "             FPS:"+parseInt(fps), x, y);
+
+    context.fillStyle = "#0000ff";
+    for (var i = 0; i < mapW; i++) {
+        for (var j = 0, m = map[i].length; j < m; j++) {
+            if (map[i][j] == 1) {
+
+                context.fillRect(i*20, j*20, 20, 20);
+
+            }
+        }
+    }
+
+    context.fillStyle = "#32CD32";
+    context.fillRect(camera.position.x/5, camera.position.z/5, 20, 20);
+
+    context.fillStyle = "#FFFF00";
+    for(var i = 0; i < crabs.length; i++)
+    {
+        context.fillRect(crabs[i].location.x/5, crabs[i].location.z/5, 20, 20);
+    }
+
     context.restore();
 }
 
@@ -256,16 +277,6 @@ function onDocumentMouseDown(e){
         bullet.createBullet(cameraPos, movementVector, scene);
         bullets.push(bullet);
     }
-
-    for(var i = 0; i < intersects.length; i++)
-    {
-        if (intersects[i].object.name == "crab")
-        {
-            scene.remove(intersects[ i ].object);
-            points++;
-        }
-    }
-
 }
 
 var cameraPrevX, cameraPrevZ;
@@ -350,7 +361,7 @@ function animate() {
     if(isInProgress) {
 
         for (var i = 0; i < crabs.length; i++) {
-            crabs[i].animate(map, mapW);
+            crabs[i].animate(map, mapW, bullets);
         }
 
         for (var i = 0; i < bullets.length; i++) {
